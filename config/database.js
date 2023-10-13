@@ -12,14 +12,14 @@ const dbConfig = {
 const db = mysql.createConnection(dbConfig);
 
 // connection to database
-async () => {
-    try {
-        const connection = db.connect() 
-        console.info(`Database Connected`);
-        return connection;
-    } catch (error) {
-        console.error(`Database connection error: ${error}`);
-    }
-};
+// async () => {
+//     try {
+//         const connection = db.connect() 
+//         console.info(`Database Connected`);
+//         return connection;
+//     } catch (error) {
+//         console.error(`Database connection error: ${error}`);
+//     }
+// };
 
 export default db;

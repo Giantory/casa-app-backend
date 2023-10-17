@@ -11,7 +11,7 @@ export const getAllConsums = (req, res) => {
         else if (results.length === 0) {
             res.status(404).json({ error: 'No se encontró ningún registro' });
         } else {
-            res.status(500).json({ error: 'Error al obtener los consumos' });
+            res.json(results);
         }
     })
 };

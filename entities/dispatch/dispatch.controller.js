@@ -16,3 +16,15 @@ export const getAllDispatches = (req, res) => {
         }
     });
 }
+
+export const createDispatch = (req, res) => {
+    const dispatch = req.body;
+    dispatchUseCases.createDispatch(dispatch, (err, results) => {
+        if (err) {
+            console.error('Error al crear el despacho', err);
+            res.status(500).json({ error: 'Error al crear el despacho' });
+        } else {
+            res.json({ message: 'Despacho creado con éxito', status: 'OK', dispatchDate: dispatch.fechaDespacho });
+        }
+    });
+};

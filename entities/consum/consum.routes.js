@@ -1,10 +1,11 @@
 import { Router } from 'express';
 
 //controllers
-import { getAllConsums } from './consum.controller.js';
+import { getAllConsums, processConsums } from './consum.controller.js';
 
 const router = new Router();
 
 router.get(`/api/consums`, getAllConsums);
+router.post(`/api/processConsums`, processConsums);
 
 export default router;

@@ -3,7 +3,7 @@ import VehicleUseCases from "./vehicle.useCases.js";
 const vehicleUseCases = new VehicleUseCases();
 
 export const getAllVehicles = (req, res) => {
-    vehicleUseCases.getAllDrivers((err, results) => {
+    vehicleUseCases.getAllVehicles((err, results) => {
         if (err) {
             console.error("Error al obtener los vehículos", err);
             res.status(500).json({ error: 'Error al obtener los vehículos' });

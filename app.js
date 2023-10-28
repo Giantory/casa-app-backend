@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 
 //router routes
 import driverRoutes from './entities/driver/driver.routes.js';
@@ -9,6 +10,9 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors({
+    origin: '*'
+}));
 
 app.use(driverRoutes);
 app.use(vehicleRoutes);

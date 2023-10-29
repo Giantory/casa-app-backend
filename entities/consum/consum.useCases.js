@@ -6,7 +6,7 @@ class ConsumUseCases {
     getAllConsums(callback) {
         db.query('SELECT * FROM consumo', callback);
     }
-    processConsums(consum, callback) {
+    processConsum(consum, callback) {
         db.query('CALL procesarConsumos(?, ?, ?, ?)', [consum.placa, consum.horometraje, consum.kilometraje, consum.galones], callback);
     }
 

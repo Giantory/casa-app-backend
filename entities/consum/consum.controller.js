@@ -16,14 +16,14 @@ export const getAllConsums = (req, res) => {
     })
 };
 
-export const processConsums = async (req, res) => {
+export const processManyConsums = async (req, res) => {
 
     const consums = req.body;
 
     try {
         const results = await Promise.all(consums.map(consum => {
             return new Promise((resolve, reject) => {
-                consumUseCases.processConsums(consum, (err, result) => {
+                consumUseCases.processConsum(consum, (err, result) => {
                     if (err) {
                         reject(err);
                     } else {
@@ -38,7 +38,26 @@ export const processConsums = async (req, res) => {
 
         res.status(200).json(flatResults);
     } catch (error) {
-        console.error('Error al crear los consumos', error);
-        res.status(500).json({ error: 'Error al crear los consumos' });
+        console.error('Error al procesar los consumos', error);
+        res.status(500).json({ error: 'Error al procesar los consumos' });
     }
 }
+
+export const processConsum = async (req, res) => {
+
+    const consum = req.body;
+    console.log(consum);
+    try {
+        consumUseCases.processConsum(consum, (err, results) => {
+            if(err){
+                res.status(500).json({error: 'No se pudo procesar el consumo'})
+            }else {            
+                res.status(200).json(results[0])
+            }
+        });
+    } catch (error) {
+        console.error('Error al procesar el consumo', error);
+        res.status(500).json({ error: 'Error al procesar el consumo' });
+    }
+}
+

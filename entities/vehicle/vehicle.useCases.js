@@ -6,7 +6,10 @@ class VehicleUseCases {
     };
 
     getAllVehicles(callback) {
-        db.query("SELECT * FROM equipo", callback);
+        db.query("SELECT eq.placa, eq.descripcion, eq.horometraje, eq.kilometraje, mo.descripcion modelo, mo.consumProm, mo.maxConsum, mo.minConsum "+
+        "FROM equipo eq "+
+        "INNER JOIN modelo mo ON eq.idModelo = mo.idModelo "+
+        "INNER JOIN marca ma ON eq.idMarca = ma.idMarca", callback);
     };
 
     getVehicleByCode(code, callback) {

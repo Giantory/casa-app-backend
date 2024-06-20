@@ -26,3 +26,24 @@ export const getVehicleByCode = (req, res) => {
         }
     });
 }
+
+export const updateVehicle = async (req, res) => {
+    const code = req.params.code;
+
+    try {
+        vehicleUseCases.updateVehicleByCode(code, (err, results) => {
+            if (err) {
+                console.error('Error al obtener el vehículo:', err);
+                res.status(500).json({ error: 'Error al obtener el vehículo' });
+            } else if (results.length == 0) {
+                res.status(400).json({ error: 'No se encontró el vehículo' });
+            } else {
+                res.json(results);
+            }
+        });
+    } catch (error) {
+        console.error('Error al procesar el consumo', error);
+        res.status(500).json({ error: 'Error al procesar el consumo' });
+    }
+
+}

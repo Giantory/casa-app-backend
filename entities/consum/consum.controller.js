@@ -43,9 +43,23 @@ export const getAllConsums = (req, res) => {
     })
 };
 
+export const getConsumoByDispatchId = (req, res) => {
+    const dispatchId = req.params.id;
+    consumUseCases.getConsumoByDispatchId(dispatchId, (err, results) => {
+        if (err) {
+            console.error('Error al obtener los consumos', err);
+            res.status(500).json({ error: 'Error al obtener los consumos' });
+        }
+        else if (results.length === 0) {
+            res.status(404).json({ error: 'No se encontró ningún registro' });
+        } else {
+            res.json(results);
+        }
+    })
+};
+
+
 export const processManyConsums = async (req, res) => {
-
-
     const consumsFile = req.file.path;
 
     function arraysAreEqual(array1, array2) {
@@ -94,11 +108,6 @@ export const processManyConsums = async (req, res) => {
 
         res.status(200).json(flatResults);
 
-
-
-
-        // Ahora `cleanedRows` contiene solo las filas que no tienen valores vacíos en las columnas requeridas
-
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: 'Error al procesar el archivo excel' })
@@ -124,5 +133,25 @@ export const processConsum = async (req, res) => {
         console.error('Error al procesar el consumo', error);
         res.status(500).json({ error: 'Error al procesar el consumo' });
     }
+}
+
+
+export const createConsum = async (req, res) => {
+
+    const consum = req.body;
+
+    try {
+        consumUseCases.processConsum(consum, (err, results) => {
+            if (err) {
+                res.status(500).json({ error: 'No se pudo procesar el consumo' })
+            } else {
+                res.status(200).json(results[0])
+            }
+        });
+    } catch (error) {
+        console.error('Error al procesar el consumo', error);
+        res.status(500).json({ error: 'Error al procesar el consumo' });
+    }
+
 }
 

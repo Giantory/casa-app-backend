@@ -1,0 +1,17 @@
+{
+    "apps": [
+        {
+            "name": "backend-app",
+            "script": "tu_archivo_de_inicio.js", 
+            "env": {
+                "DB_HOST": "127.0.0.1",
+                "DB_USER": "root",
+                "DB_PASSWORD": "",
+                "DB_NAME": "casadb"
+            },
+            "env_production": {
+                "NODE_ENV": "production" 
+            }
+        }
+    ]
+}

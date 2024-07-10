@@ -5,7 +5,7 @@ import multer from 'multer';
 import path from 'path';
 
 //controllers
-import { getAllConsums, getConsumoByDispatchId, processConsum, processManyConsums, createConsum } from './consum.controller.js';
+import { getAllConsums, getConsumoByDispatchId, processConsum, processManyConsums, createConsum, addConsum } from './consum.controller.js';
 
 const storage = multer.diskStorage({
     destination: "./public/uploads/files",
@@ -24,6 +24,7 @@ const router = new Router();
 router.get(`/api/consums`, getAllConsums);
 router.get(`/api/consums/:id/`, getConsumoByDispatchId);
 router.post(`/api/consums/processConsum`, processConsum);
+router.post(`/api/consums/addConsum`, addConsum);
 router.post(`/api/consums/processManyConsums`, upload.single("file"), processManyConsums);
 router.post(`/api/consums/createConsum`, createConsum);
 

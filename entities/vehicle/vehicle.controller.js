@@ -45,7 +45,7 @@ export const updateVehicle = async (req, res) => {
     const code = req.params.code;
 
     try {
-        vehicleUseCases.updateVehicleByCode(code, (err, results) => {
+        vehicleUseCases.updateVehicle(code, (err, results) => {
             if (err) {
                 console.error('Error al obtener el vehículo:', err);
                 res.status(500).json({ error: 'Error al obtener el vehículo' });
@@ -63,20 +63,52 @@ export const updateVehicle = async (req, res) => {
 }
 
 export const createVehicle = async (req, res) => {
-
     const vehicle = req.body;
-
     try {
-        vehicleUseCases.createVehicle(vehicle, (err, results) => {
+        // Verificar si la placa ya existe
+        vehicleUseCases.checkVehicleExists(vehicle.placa, (err, results) => {
             if (err) {
-                res.status(500).json({ error: 'No se pudo crear el vehículo' })
-            } else {
-                res.status(200).json(results[0])
+                console.log(err);
+                return res.status(500).json({ error: 'Error al verificar el vehículo' });
             }
+            if (results.length > 0) {
+                return res.status(400).json({ error: 'El vehículo con esta placa ya existe' });
+            }
+
+            // Si la placa no existe, procede a crear el vehículo
+            vehicleUseCases.createVehicle(vehicle, (err, results) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).json({ error: 'No se pudo crear el vehículo' });
+                } else {
+                    // Obtener el ID del vehículo recién creado
+                    const code = results.placa;
+                    // Obtener los datos completos del vehículo creado
+                    vehicleUseCases.getVehicleByCode(code, (err, vehicleData) => {
+                        if (err) {
+                            console.log(err);
+                            return res.status(500).json({ error: 'No se pudo obtener el vehículo creado' });
+                        } else {
+                            return res.status(200).json(vehicleData);
+                        }
+                    });
+                }
+            });
         });
     } catch (error) {
         console.error('Error al crear el vehículo', error);
         res.status(500).json({ error: 'Error al crear el vehículo' });
     }
-
 }
+
+
+export const getVehiclesAmount = (req, res) => {
+    vehicleUseCases.getVehiclesAmount((err, results) => {
+        if (err) {
+            console.error("Error al obtener los vehículos", err);
+            res.status(500).json({ error: 'Error al obtener los vehículos' });
+        } else {
+            res.json(results);
+        }
+    });
+};

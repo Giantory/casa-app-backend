@@ -4,7 +4,8 @@ class VehicleUseCases {
     constructor() { }
 
     getAllVehicles(callback) {
-        db.query("SELECT eq.placa, eq.descripcion, eq.horometraje, eq.kilometraje, ma.descripcion marca, mo.descripcion modelo, mo.consumProm, mo.maxConsum, mo.minConsum " +
+        db.query("SELECT eq.placa, eq.descripcion, eq.horometraje, eq.kilometraje, eq.idModelo, eq.idMarca, "+
+            "ma.descripcion marca, mo.descripcion modelo, mo.consumProm, mo.maxConsum, mo.minConsum " +
             "FROM equipo eq " +
             "INNER JOIN modelo mo ON eq.idModelo = mo.idModelo " +
             "INNER JOIN marca ma ON eq.idMarca = ma.idMarca", callback);
@@ -25,10 +26,19 @@ class VehicleUseCases {
     updateVehicleHMKMByCode(code, horometraje, kilometraje, callback) {
         db.query("UPDATE equipo SET horometraje=?, kilometraje=? WHERE placa=?", [horometraje, kilometraje, code], callback);
     }
-    createVehicle(code, callback) {
-        db.query("INSERT INTO equipo (placa, descripcion, idModelo, idMarca, idFrente, estado, horometraje, kilometraje, updated_at)" +
-            "VALUES (?,?,?,?,?,?,?,?,?)",
-            [code], callback);
+
+    checkVehicleExists(placa, callback) {
+        db.query("SELECT * FROM equipo WHERE placa = ?", [placa], callback);
+    }
+    createVehicle(vehicle, callback) {
+        const query = "INSERT INTO equipo (placa, descripcion, horometraje, kilometraje, idMarca, idModelo) VALUES (?, ?, ?, ?, ?, ?)";
+        const values = [vehicle.placa, vehicle.descripcion, vehicle.horometraje, vehicle.kilometraje, vehicle.idMarca, vehicle.idModelo];
+        db.query(query, values, callback);
+    }
+
+    getVehiclesAmount(callback){
+        db.query("SELECT (SELECT COUNT(*) FROM equipo) AS total_vehiculos, "+
+    "(SELECT COUNT(*) FROM equipo WHERE updated_at >= NOW() - INTERVAL 7 DAY) AS vehiculos_recientes;", callback)
     }
 }
 

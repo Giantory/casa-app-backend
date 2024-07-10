@@ -25,6 +25,10 @@ const schema = {
         prop: 'galones',
         type: Number,
     },
+    'operador': {
+        prop: 'operador',
+        type: String,
+    },
 };
 
 
@@ -63,7 +67,6 @@ export const processManyConsums = async (req, res) => {
     const consumsFile = req.file.path;
 
     function arraysAreEqual(array1, array2) {
-
         console.log(array1, array2);
         if (array1.length !== array2.length) {
             return false;
@@ -75,55 +78,94 @@ export const processManyConsums = async (req, res) => {
         }
         return true;
     }
+
     try {
         const expectedHeader = Object.keys(schema);
-        const { rows, errors } = await readXlsxFile(consumsFile, { schema, trim: false },);
-        const consums = rows.filter((row) => {
-            if (row.galones != null) {
-                return row;
-            }
-        });
+        const { rows, errors } = await readXlsxFile(consumsFile, { schema, trim: false });
+        const consums = rows.filter((row) => row.galones != null);
         const actualHeader = Object.keys(consums[0]);
-        if (arraysAreEqual(expectedHeader, actualHeader)) {
-            rows.slice(1); // Excluye la fila de cabecera
-        } else {
-            res.status(400).json({ error: 'La cabecera del archivo no es correcta.' });
+
+        if (!arraysAreEqual(expectedHeader, actualHeader)) {
+            return res.status(400).json({ error: 'La cabecera del archivo no es correcta.' });
         }
+
         const results = await Promise.all(consums.map(consum => {
             return new Promise((resolve, reject) => {
-                consumUseCases.processConsum(consum, (err, result) => {
+                consumUseCases.processConsum(consum, async (err, result) => {
                     if (err) {
                         reject(err);
                     } else {
-                        resolve(result);
+                        if (!result || result.length === 0) {
+                            // No se encontró el vehículo, agregar uno nuevo
+                            const newVehicle = {
+                                equipo: 'Nuevo',
+                                marca: 'Desconocida',
+                                galones: consum.galones,
+                                modelo: 'Desconocido',
+                                placa: consum.placa,
+                                horometraje: consum.horometraje,
+                                kilometraje: consum.kilometraje,
+                                rendimiento: 0,
+                                estadoCodigo: 6,
+                                estadoDescripcion: 'Nuevo',
+                                currentHorometraje: consum.horometraje,
+                                operador: consum.operador,
+                                currentKilometraje: consum.kilometraje,
+                                mensaje: 'Vehículo nuevo'
+                            };
+                            resolve(newVehicle);
+                        } else {
+                            resolve(result[0]); // Devolver el resultado completo
+                        }
                     }
                 });
             });
         }));
-        const flatResults = (results.map(result => {
-            return result[0]; //
-        })).map(result => {
-            return result[0]; //
-        });
+
+        const flatResults = results.map(result => result);
 
         res.status(200).json(flatResults);
 
     } catch (error) {
         console.log(error);
-        res.status(500).json({ error: 'Error al procesar el archivo excel' })
+        res.status(500).json({ error: 'Error al procesar el archivo excel' });
     }
-
 }
-
-
 
 export const processConsum = async (req, res) => {
 
     const consum = req.body;
 
+    console.log(consum)
+
     try {
         consumUseCases.processConsum(consum, (err, results) => {
             if (err) {
+                res.status(500).json({ error: 'No se pudo procesar el consumo' })
+            } else {
+                res.status(200).json(results[0])
+            }
+        });
+    } catch (error) {
+        console.error('Error al procesar el consumo', error);
+        res.status(500).json({ error: 'Error al procesar el consumo' });
+    }
+}
+
+export const addConsum = async (req, res) => {
+
+    const consum = req.body;
+
+    console.log(consum)
+
+    try {
+        consumUseCases.addConsum(consum, (err, results) => {
+            if (err) {
+                if (err.code == 'ER_SIGNAL_EXCEPTION') {
+                    console.log(err)
+                    return res.status(500).json({ error: 'Horómetro o kilometraje actual es igual al ingresado' })
+                }
+                console.log(err)
                 res.status(500).json({ error: 'No se pudo procesar el consumo' })
             } else {
                 res.status(200).json(results[0])

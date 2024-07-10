@@ -4,6 +4,8 @@ import cors from 'cors';
 //router routes
 import driverRoutes from './entities/driver/driver.routes.js';
 import vehicleRoutes from './entities/vehicle/vehicle.routes.js';
+import modelRoutes from './entities/model/model.routes.js';
+import brandRoutes from './entities/brand/brand.routes.js';
 import consumRoutes from './entities/consum/consum.routes.js';
 import dispatchRoutes from './entities/dispatch/dispatch.routes.js';
 import analyticRoutes from './entities/analytic/analytic.routes.js';
@@ -22,5 +24,8 @@ app.use(vehicleRoutes);
 app.use(consumRoutes);
 app.use(dispatchRoutes);
 app.use(analyticRoutes);
+app.use(modelRoutes);
+app.use(brandRoutes);
+
 
 export default app;

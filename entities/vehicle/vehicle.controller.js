@@ -42,25 +42,32 @@ export const getVehicleDetailsByCode = (req, res) => {
 }
 
 export const updateVehicle = async (req, res) => {
-    const code = req.params.code;
+    const currentCode = req.params.code; // placa actual
+    const { placa, descripcion, horometraje, kilometraje, idMarca, idModelo } = req.body; // nueva placa y otros campos
 
     try {
-        vehicleUseCases.updateVehicle(code, (err, results) => {
+        vehicleUseCases.updateVehicle(currentCode, placa, descripcion, horometraje, kilometraje, idMarca, idModelo, (err, results) => {
             if (err) {
-                console.error('Error al obtener el vehículo:', err);
-                res.status(500).json({ error: 'Error al obtener el vehículo' });
-            } else if (results.length == 0) {
+                console.error('Error al actualizar el vehículo:', err);
+                res.status(500).json({ error: 'Error al actualizar el vehículo' });
+                return;
+            }
+
+            if (results.affectedRows === 0) {
                 res.status(400).json({ error: 'No se encontró el vehículo' });
             } else {
-                res.json(results);
+                res.json({ message: 'Vehículo actualizado correctamente', results });
             }
         });
     } catch (error) {
-        console.error('Error al procesar el consumo', error);
-        res.status(500).json({ error: 'Error al procesar el consumo' });
+        console.error('Error al procesar la actualización', error);
+        res.status(500).json({ error: 'Error al procesar la actualización' });
     }
-
 }
+
+
+
+
 
 export const createVehicle = async (req, res) => {
     const vehicle = req.body;
